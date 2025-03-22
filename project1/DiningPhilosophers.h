@@ -9,17 +9,17 @@
 #include <thread>
 #include <vector>
 
-const int NUM_PHILOSOPHERS = 5;
 using namespace std;
 
 class DiningPhilosophers {
 private:
-    bool forks[NUM_PHILOSOPHERS];  // Tablica widelców (true = zajęty, false = dostępny)
+    vector<bool> forks;  // Tablica widelców (true = zajęty, false = dostępny)
+    int numPhilosophers; // Liczba filozofów
 
 public:
-    DiningPhilosophers();
-
+    DiningPhilosophers(int numPhilosophers);  // Konstruktor przyjmujący liczbę filozofów
+    void pickUpForks(int i);  // Podnoszenie widelców
+    void putDownForks(int i);  // Odstawianie widelców
 };
-
 
 #endif //PROJECT1_DININGPHILOSOPHERS_H
