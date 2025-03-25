@@ -5,9 +5,11 @@
 #include "DiningPhilosophers.h"
 #include <algorithm>
 
+std::mutex DiningPhilosophers::printMutex;
+
 DiningPhilosophers::DiningPhilosophers(int numPhilosophers) {
     this->numPhilosophers = numPhilosophers;
-    forks.resize(numPhilosophers, false);  // Inicjalizacja wektora widelców
+    forks = vector<mutex>(numPhilosophers); // Inicjalizacja wektora mutexów
 }
 
 // Funkcja próbująca podnieść widelec
@@ -15,17 +17,9 @@ void DiningPhilosophers::pickUpForks(int i) {
     int first = min(i, (i + 1) % numPhilosophers);
     int second = max(i, (i + 1) % numPhilosophers);
 
-    while (true) {
-        // Spróbuj podnieść pierwszy widelec, jeśli jest dostępny
-        if (!forks[first] && !forks[second]) {
-            forks[first] = true;  // Podnosimy pierwszy widelec
-            forks[second] = true; // Podnosimy drugi widelec
-            return;
-        }
+    // Aby uniknąć zakleszczeń, najpierw próbujemy zablokować mniejszy numer widelca
+    lock(forks[first], forks[second]);  // Blokowanie mutexów
 
-        // Jeśli nie udało się podnieść, pozwól innym filozofom na podniesienie swoich widelców
-        this_thread::yield();  // Odstępujemy czas innym wątkom
-    }
 }
 
 // Funkcja zwracająca widelce
@@ -33,7 +27,16 @@ void DiningPhilosophers::putDownForks(int i) {
     int first = min(i, (i + 1) % numPhilosophers);
     int second = max(i, (i + 1) % numPhilosophers);
 
-    forks[first] = false;  // Zwracamy pierwszy widelec
-    forks[second] = false; // Zwracamy drugi widelec
+    forks[first].unlock();
+    forks[second].unlock();
 }
+
+void DiningPhilosophers::printSync(int i, const string &message) {
+    // Zablokowanie mutexu przed wypisaniem do konsoli
+    std::lock_guard<std::mutex> lock(printMutex);
+
+    // Wypisujemy komunikat
+    cout << "Philosopher " << i << " " << message << endl;
+}
+
 

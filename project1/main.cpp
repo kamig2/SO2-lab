@@ -7,19 +7,15 @@ using namespace std;
 
 void philosopher(DiningPhilosophers &table, int id) {
     while (true) {
-        // Thinking
-        cout << "Philosopher " << id << " is thinking.\n";
+        table.printSync(id, "is thinking.");
         this_thread::sleep_for(chrono::milliseconds(1000));
 
-        // Hungry
-        cout << "Philosopher " << id << " is hungry.\n";
+        table.printSync(id, "is hungry.");
         table.pickUpForks(id);
 
-        // Eating
-        cout << "Philosopher " << id << " is eating.\n";
+        table.printSync(id, "is eating.");
         this_thread::sleep_for(chrono::milliseconds(1000));
 
-        // Done eating
         table.putDownForks(id);
     }
 }
