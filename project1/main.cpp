@@ -29,6 +29,12 @@ int main(int argc, char* argv[]) {
     // Wczytujemy liczbę filozofów z argumentu wiersza poleceń
     int numPhilosophers = stoi(argv[1]);
 
+    //Sprawdzenie, czy liczba filozofów jest większa niż 1
+    if (numPhilosophers <= 1) {
+        cerr << "Error: The number of philosophers must be greater than 1." << endl;
+        return 1;
+    }
+
     DiningPhilosophers table(numPhilosophers);  // Tworzymy stół z odpowiednią liczbą filozofów
     vector<thread> philosophers;
 
