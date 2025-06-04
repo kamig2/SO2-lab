@@ -5,10 +5,13 @@ HOST = '0.0.0.0'
 PORT = 12345
 
 clients = []
+clients_lock = threading.Lock() 
 
 def handle_client(client_socket, addr):
     print(f"[NOWY UŻYTKOWNIK] {addr} dołączył.")
-    clients.append(client_socket)
+
+    with clients_lock:
+        clients.append(client_socket)  
 
     while True:
         try:
@@ -20,16 +23,19 @@ def handle_client(client_socket, addr):
             break
 
     print(f"[ROZŁĄCZONO] {addr}")
-    clients.remove(client_socket)
+    with clients_lock:
+        if client_socket in clients:
+            clients.remove(client_socket)  
     client_socket.close()
 
 def broadcast(message, sender_socket):
-    for client in clients:
-        if client != sender_socket:
-            try:
-                client.sendall(message.encode())
-            except:
-                pass
+    with clients_lock:
+        for client in clients:
+            if client != sender_socket:
+                try:
+                    client.sendall(message.encode())
+                except:
+                    pass
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
     server.bind((HOST, PORT))
